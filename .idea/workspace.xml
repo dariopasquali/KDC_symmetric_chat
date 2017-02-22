@@ -1,15 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="6619a7e7-909e-4a84-be9a-3b64add8b060" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/KDC_security/com/pasquali/entities/Alice.class" afterPath="$PROJECT_DIR$/out/production/KDC_security/com/pasquali/entities/Alice.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/KDC_security/com/pasquali/entities/Bob.class" afterPath="$PROJECT_DIR$/out/production/KDC_security/com/pasquali/entities/Bob.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/KDC_security/com/pasquali/entities/KDC.class" afterPath="$PROJECT_DIR$/out/production/KDC_security/com/pasquali/entities/KDC.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/pasquali/entities/Alice.java" afterPath="$PROJECT_DIR$/src/com/pasquali/entities/Alice.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/pasquali/entities/Bob.java" afterPath="$PROJECT_DIR$/src/com/pasquali/entities/Bob.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/pasquali/entities/KDC.java" afterPath="$PROJECT_DIR$/src/com/pasquali/entities/KDC.java" />
-    </list>
+    <list default="true" id="6619a7e7-909e-4a84-be9a-3b64add8b060" name="Default" comment="" />
     <ignored path="$PROJECT_DIR$/out/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
