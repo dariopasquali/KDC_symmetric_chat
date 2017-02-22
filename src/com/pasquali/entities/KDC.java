@@ -50,10 +50,10 @@ public class KDC {
             // **************** WAIT ALICE'S CONNECTION *******************
 
             ServerSocket socket = new ServerSocket(5555);
-            System.out.println("KDC || KDC listening on 5555\n");
+            System.out.println("KDC in ascolto, porta 5555\n");
 
             Socket alice = socket.accept();
-            System.out.println("KDC || Hi Alice!!");
+            System.out.println("client connesso");
 
             inSock = new ObjectInputStream(alice.getInputStream());
             outSock = new ObjectOutputStream(alice.getOutputStream());
@@ -62,17 +62,14 @@ public class KDC {
 
             MasterKeyRequest request = (MasterKeyRequest)inSock.readObject();
 
-            System.out.println("KDC || Alice Request");
-            System.out.println("KDC || "+request.nonce);
-            System.out.println("KDC || "+request.idA);
-            System.out.println("KDC || "+request.idB);
+            System.out.println("ID:"+request.idA+" richeide una master key");
+            System.out.println("per comunicare con ID:"+request.idB);
+            System.out.println("Estraggo le chiavi simmetriche KA e KB");
 
             // **************** GENERATE MASTER KEY AND ANSWER *******************
 
-            System.out.println("KDC || Generate mastery key and answer");
+            System.out.println("Genero la chiave di sessione");
             masterKey = KeyManager.generateKey();
-
-            System.out.println("KDC || "+masterKey.toString());
 
             MKagreement agreement = new MKagreement(aliceID, masterKey);
             byte[] encryptedAgreement = ChiperUtils.encrypt(agreement, kb);
@@ -84,7 +81,7 @@ public class KDC {
 
             outSock.writeObject(new RawBytes(encResponse));
 
-            System.out.println("KDC || My job is done, i have to gom bye!!");
+            System.out.println("Chiave di sessione inviata, termino il protocollo.");
 
             inSock.close();
             outSock.close();

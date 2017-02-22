@@ -53,7 +53,7 @@ public class Alice {
             // **************** INIT *******************
 
             kdc = new Socket(kdcAddr, kdcPort);
-            System.out.println("ALICE || Socket connected to KDC");
+            System.out.println("Socket connessa al KDC, chiave simmetrica KA precondivisa");
 
             outKdcSock = new ObjectOutputStream(kdc.getOutputStream());
             inKdcSock = new ObjectInputStream(kdc.getInputStream());
@@ -69,12 +69,12 @@ public class Alice {
 
             //***************** MASTER KEY REQUEST ******************************
 
-            System.out.print("ALICE || Starting KDC master key request");
+            System.out.print("Invio la richiesta di master key :: Ra || A || B ::");
 
             MasterKeyRequest mkReq = new MasterKeyRequest(RaNonce, aliceID, bobID);
             outKdcSock.writeObject(mkReq);
             outKdcSock.flush();
-            System.out.println("ALICE || Master Key Request sent, i'm waiting the KDC answer");
+            System.out.println("Richiesta inviata, attendo la risposta");
 
             //***************** MASTER KEY RESPONSE ******************************
 
@@ -84,7 +84,7 @@ public class Alice {
 
             if(!bobID.equals(kdcResponse.B))
             {
-                System.out.println("ALICE || The BOB ID is incorrect");
+                System.out.println("L'ID di Bob con corrisponde, termino il protocollo");
                 outKdcSock.close();
                 inKdcSock.close();
                 kdc.close();
@@ -93,7 +93,7 @@ public class Alice {
 
             if(!Arrays.equals(RaNonce, kdcResponse.nonce))
             {
-                System.out.println("ALICE || My Ra Nonce is incorrect");
+                System.out.println("Il nonce Ra non corrisponde, termino il protocollo");
                 outKdcSock.close();
                 inKdcSock.close();
                 kdc.close();
@@ -102,6 +102,14 @@ public class Alice {
 
             masterKey = kdcResponse.key;
             RawBytes encryptedMKtoBob = new RawBytes(kdcResponse.encryptedMKagreement);
+
+            System.out.print("Master Key = {");
+            for(byte b : masterKey.getEncoded())
+                System.out.print(b);
+            System.out.println("}");
+
+            System.out.println("Inizio la comunicazione con Bob");
+
 
             //======================================================================================
             //***************** CLOSE KDC SOCKET AND OPEN BOB SOCKET ******************************
@@ -112,7 +120,7 @@ public class Alice {
             kdc.close();
 
             bob = new Socket(bobAddr, bobPort);
-            System.out.println("ALICE || Socket connected to BOB");
+            System.out.println("Socket connessa a BOB");
 
             outBobSock = new ObjectOutputStream(bob.getOutputStream());
             inBobSock = new ObjectInputStream(bob.getInputStream());
@@ -121,7 +129,7 @@ public class Alice {
 
             outBobSock.writeObject(encryptedMKtoBob);
             outBobSock.flush();
-            System.out.println("ALICE || Alice Sent Master key to Bob");
+            System.out.println("Invio la Master Key a Bob :: Ekb( k || A ) ::");
 
             //***************** RECEIVE CHALLENGE FROM BOB ******************************
 
@@ -130,16 +138,18 @@ public class Alice {
 
             //***************** SEND RESPONSE BOB ******************************
 
+            System.out.println("Rispondo alla sfida di Bob");
+
             BigInteger response = RbNonce.subtract(new BigInteger(String.valueOf(1)));
             RawBytes data = new RawBytes(ChiperUtils.encrypt(response.toByteArray(), masterKey));
             outBobSock.writeObject(data);
 
-            System.out.println("ALICE || It works!!");
-            System.out.println("ALICE || Now we can chat with the Master Key Protocol!");
+            System.out.println("Master Key Condivisa");
+            System.out.println("Ora possiamo chattare.");
 
             while (true)
             {
-                System.out.println("Message: ");
+                System.out.print("Messaggio: ");
                 String msg = in.readLine();
 
                 Key sessionKey = KeyManager.generateKey();
@@ -151,8 +161,13 @@ public class Alice {
 
                 outBobSock.writeObject(message);
 
-                System.out.println("-------------------------Message sent");
-                System.out.println("-------------------------Wait Bob Answer");
+                System.out.print("Messaggio = {");
+                for(byte b : encMessage)
+                    System.out.print(b);
+                System.out.println("}");
+
+                System.out.println("::: Messaggio inviato :::");
+                System.out.println("::: Attendo risposta :::");
 
                 Message answer = (Message) inBobSock.readObject();
 
@@ -161,7 +176,7 @@ public class Alice {
 
                 String ansString = new String(ChiperUtils.decrypt(answer.encMessage, bobSessionKey));
 
-                System.out.println("Answer: "+ansString);
+                System.out.println("Risposta: "+ansString);
             }
 
 

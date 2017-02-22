@@ -51,10 +51,10 @@ public class Bob {
             // **************** WAIT ALICE'S CONNECTION *******************
 
             ServerSocket socket = new ServerSocket(6666);
-            System.out.println("BOB || Bob listening on 6666\n");
+            System.out.println("Bob in ascolto, porta 6666\n");
 
             Socket alice = socket.accept();
-            System.out.println("BOB || Hi Alice!!");
+            System.out.println("Client connesso");
 
             inSock = new ObjectInputStream(alice.getInputStream());
             outSock = new ObjectOutputStream(alice.getOutputStream());
@@ -65,15 +65,16 @@ public class Bob {
             MKagreement mkAgreement = SerializationUtils
                     .deserialize(ChiperUtils.decrypt(encryptedAgreement.rawData, kb));
 
-            System.out.println("BOB || Receive Master Key Agreement");
-            System.out.println("BOB || from "+mkAgreement.A);
-            System.out.println("BOB || master key "+ mkAgreement.key);
+            System.out.println("Ricevo la master key");
+            System.out.println("Da ID:"+mkAgreement.A);
 
             masterKey = mkAgreement.key;
 
             // **************** SEND CHALLENGE *******************
 
-            System.out.println("BOB || let's check the identity of Alice");
+            System.out.println("Verifico l'identità di Alice con un nonce");
+            System.out.println("genero Rb e lo trasmetto cifrato con k :: Ek( Rb ) ::");
+            System.out.println("Mi aspetto Rb - 1");
 
             byte[] Rb = NumberUtils.getNonce();
             outSock.writeObject(new RawBytes(ChiperUtils.encrypt(Rb, masterKey)));
@@ -82,24 +83,16 @@ public class Bob {
             // **************** WAIT CHALLENGE RESPONSE *******************
 
             BigInteger bigNonce = new BigInteger(Rb);
-
-            System.out.println("BOB || I sent "+bigNonce.toString());
-
             BigInteger challengeCheck = bigNonce.subtract(new BigInteger(String.valueOf(1)));
-
-            System.out.println("BOB || I expect "+challengeCheck.toString());
 
             RawBytes encryptAnswer = (RawBytes) inSock.readObject();
             BigInteger answer = new BigInteger(ChiperUtils.decrypt(encryptAnswer.rawData, masterKey));
 
-            System.out.println("BOB || I received "+answer.toString());
-
             if(answer.equals(challengeCheck))
             {
-                System.out.println("BOB || Alice confirmed my challenge, she obtain the master key from the KDC");
-
-                System.out.println("BOB || It works!!");
-                System.out.println("BOB || Now we can chat with the Master Key Protocol!");
+                System.out.println("La risposta di Alice è corretta, ha ottenuto la Master Key dal KDC");
+                System.out.println("Inoltre la chiave non è mai stata usata prima");
+                System.out.println("ora possiamo chattare");
 
                 while (true)
                 {
@@ -110,9 +103,9 @@ public class Bob {
 
                     String ansString = new String(ChiperUtils.decrypt(ansMsg.encMessage, bobSessionKey));
 
-                    System.out.println("Alice Message: "+ansString);
+                    System.out.println("Messaggio di Alice: "+ansString);
 
-                    System.out.println("Answer: ");
+                    System.out.print("Risposta: ");
                     String msg = in.readLine();
 
                     Key sessionKey = KeyManager.generateKey();
@@ -124,13 +117,14 @@ public class Bob {
 
                     outSock.writeObject(message);
 
-                    System.out.println("-------------------------Answer sent");
-                    System.out.println("-------------------------Wait Alice Message");
+                    System.out.println("::: Risposta inviata :::");
+                    System.out.println("::: Attendo messaggio :::");
                 }
             }
             else
             {
-                System.out.print("BOB || Alice è una perzona falza!!!!! PULUZIA CONTATTI IS COMING");
+                System.out.print("Il nonce non corrisponde, o la chiave è già stata usata");
+                System.out.print("termino il protocollo");
             }
 
 
